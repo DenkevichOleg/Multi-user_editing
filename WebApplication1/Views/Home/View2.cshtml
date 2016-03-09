@@ -1,0 +1,26 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+    <h3>Выберите файл для загрузки</h3>
+
+    @using (Html.BeginForm("Upload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="file" name="uploadImg" accept="image/*,image/jpeg" /><br>
+        <input type="file" name="uploadAud" accept="audio/*,audio/mp3" /><br>
+        <input type="text" name="userID" value="View2" hidden="hidden"/><br>
+        <input type="submit" value="Загрузить" />
+    }
+
+
+    <div id="log">шшш</div>
+
+</body>
+</html>

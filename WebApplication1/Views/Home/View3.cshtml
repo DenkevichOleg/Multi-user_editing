@@ -1,0 +1,114 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Geo</title>
+    <script src="http://maps.google.com/maps/api/js?sensor =true"
+            type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        var ggmap;	//	объект google-карты
+        var divid;	//	id тега div
+        var BSTUcoords = { latitude: 53.8914, longitude: 27.5598 }; // БГТУ 53.662725, 23.821707
+        var grodCoords = { latitude: 53.662725, longitude: 23.821707 };
+        var moglCoords = { latitude: 53.908365, longitude: 30.319768 };
+        var brstCoords = { latitude: 52.105006, longitude: 23.722830 };
+        var vitbCoords = { latitude: 55.196290, longitude: 30.204763 };
+        var gomlCoords = { latitude: 52.454522, longitude: 30.973806 };
+        var currcoords = BSTUcoords; // текщие коодинаты
+
+        function WriteMessage(iddiv, txt) {
+            var div = document.getElementById(iddiv);
+            div.innerHTML = txt;
+        }
+
+        function init() {
+            WriteMessage("coords", "Координаты БГТУ: широта: " + currcoords.latitude +
+                        ", долгота: " + currcoords.longitude);
+            showMap("ggmap");
+        }
+
+        function GetMylocation(iddiv) {
+            WriteMessage(iddiv, "старт GetMyLocation");
+            divid = iddiv;
+            var options = { timeout: 90000, maximumAge: 600000 };
+            if (navigator.geolocation)
+                navigator.geolocation.getCurrentPosition(displayLocation, errorHandler, options);
+            else WriteMessage(iddiv, "geolocation не поддерживается");
+            WriteMessage(iddiv, "завершение GetMyLocation");
+        }
+
+        function errorHandler(err) {
+            if (err.code == 1) alert("Ошибка: Нет доступа");
+            else if (err.code == 2) alert("Ошибка: Координаты не определены");
+            else if (err.code == 3) alert("Ошибка: превышен Timeout");
+            else alert("Error: " + err.code);
+        }
+
+        function displayLocation(position) {
+            currcoords = position.coords;
+            var latx = position.coords.latitude;
+            var longx = position.coords.longitude;
+            var acc = position.coords.accuracy;
+            WriteMessage(divid, "Текущие координаты: широта: " + latx.toFixed(4) +
+            ", долгота: " + longx.toFixed(4) +
+            ", точность: " + acc + " метров ");
+        }
+
+        function showMap(iddiv, coords) {
+            if (coords == null) coords = currcoords;
+            var gglatlng1 = new google.maps.LatLng(currcoords.latitude, currcoords.longitude);
+            var gglatlng2 = new google.maps.LatLng(grodCoords.latitude, grodCoords.longitude);
+            var gglatlng3 = new google.maps.LatLng(moglCoords.latitude, moglCoords.longitude);
+            var gglatlng4 = new google.maps.LatLng(brstCoords.latitude, brstCoords.longitude);
+            var gglatlng5 = new google.maps.LatLng(vitbCoords.latitude, vitbCoords.longitude);
+            var gglatlng6 = new google.maps.LatLng(gomlCoords.latitude, gomlCoords.longitude);
+            var gglatlng7 = new google.maps.LatLng(coords.latitude, coords.longitude);
+            var ggmapoption = {
+                zoom: 7, center: gglatlng1,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var div2 = document.getElementById(iddiv);
+            ggmap = new google.maps.Map(div2, ggmapoption);
+            addMarker(gglatlng7, 'Мое месторасположение', ggmap);
+            addMarker(gglatlng2, 'Гродно', ggmap);
+            addMarker(gglatlng3, 'Могилев', ggmap);
+            addMarker(gglatlng4, 'Брест', ggmap);
+            addMarker(gglatlng5, 'Витебск', ggmap);
+            addMarker(gglatlng6, 'Гомель', ggmap);
+        }
+
+        function addMarker(latlng, title, map) {
+            if (map == null) map = ggmap;
+            var optionsMarker = { position: latlng, map: map, title: title, clickable: true };
+            var marker = new google.maps.Marker(optionsMarker);
+        }
+    </script>
+
+</head>
+
+<body onload="init()">
+
+    <h3>Лаба 1</h3>
+
+        <input type="button" value="Определить месторасположение"
+               onclick="GetMylocation('coords')" style="width: 230px" />
+        <div id="coords" style="float: right; width: 800px"> </div>
+
+    <br><br>
+
+        <input type="button" value="Показать карту"
+               onclick="showMap('ggmap')" style="width: 230px" />
+        <div id="ggmap" style="float:right; width:800px; height:600px; background:black;
+               border-style:solid; border-width:1px;">
+        </div>
+
+
+</body>
+</html>

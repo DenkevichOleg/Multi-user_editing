@@ -1,0 +1,168 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style type="text/css">
+        html {
+            height: 100%;
+        }
+
+        body {
+            margin: auto;
+            height: 100%;
+        }
+
+        #cont {
+            margin: auto;
+            width: 800px;
+            height: 100%;
+        }
+
+        #cnvsAndTxtOut {
+            border: #808080 1px solid;
+            width: 800px;
+        }
+
+        #cnvs {
+            margin: -1px;
+            border: #808080 1px solid;
+            cursor: default;
+        }
+
+        #chatOut {
+            text-align: start;
+            overflow-y: scroll;
+            word-wrap: break-word;
+            min-height: 100px;
+            width: 800px;
+        }
+
+        #chatInAndBttn {
+            border: #808080 1px solid;
+            width: 800px;
+        }
+
+        #chatIn {
+            width: 700px;
+        }
+
+        #clearCnvs {
+            width: 90px;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        var mAction = "up", curColor = '"#000000"', curWidth = 2,
+        ctx, points, cont, cnvsDiv, cnvs, chatOut, chatInAndBttn, chatIn, ws, cws;
+
+        function init() {
+            cont = document.getElementById('cont');
+            cnvsDiv = document.getElementById('cnvsDiv');
+            cnvs = document.getElementById('cnvs');
+            chatOut = document.getElementById('chatOut');
+            chatInAndBttn = document.getElementById('chatInAndBttn');
+            chatIn = document.getElementById('chatIn');
+
+            ctx = cnvs.getContext('2d');
+            ctx.globalAlpha = 1;
+            points = new Array(2);//многомерный массив, хранилище координат и кисточек
+
+            ws = new WebSocket('ws://localhost:5314/Websockets.websocket');//обращение к веб сокету для чата
+            ws.onopen = function () { };
+            ws.onerror = function (error) { chatOut.innerHTML += "Ошибка: websocket" + error.message; };
+            ws.onmessage = function (evt) {//обработка получения сообщений из сокета
+                chatOut.innerHTML += evt.data + "<br>";
+                chatOut.scrollTop = chatOut.scrollHeight;//ползунок чата всегда внизу
+            };
+
+            cws = new WebSocket('ws://localhost:5314/CWebsockets.cwebsocket');//обращение к веб сокету для канваса
+            cws.onopen = function () { };
+            cws.onerror = function (error) { chatOut.innerHTML += "Ошибка canvas websocket: " + error.message; };
+            cws.onmessage = function (evt) {//обработка получения сообщений из сокета
+                //chatOut.innerHTML += evt.data + "--<br>";
+                brash = JSON.parse(evt.data);
+                //chatOut.innerHTML += brash + "..<br>";
+                if (brash == "clear") ctx.clearRect(0, 0, 800, 450);
+                else {
+                    ctx.lineWidth = brash.width;
+                    ctx.strokeStyle = brash.color;
+                    ctx.beginPath();
+                    ctx.moveTo(brash.coords[0], brash.coords[1]); //от
+                    ctx.lineTo(brash.coords[2], brash.coords[3]); //до
+                    ctx.stroke();//нарисовать линию
+                }
+            }
+            onre();//вызов функции определения размеров области чата chatOut
+        };
+        function mDown(e) {
+            mAction = "down";
+            points = [e.pageX - cnvs.offsetLeft, e.pageY - cnvs.offsetTop];//устанавливаем  начальные координаты линии
+        };
+        function mUp(e) {
+            points = new Array(10);
+            mAction = "up";
+        };
+        function mMove(e) {
+            if (mAction == "down") {
+                var lineStartX = points[0],
+                    lineStartY = points[1],//начальные координаты линии относительно верхнего левого угла canvas
+                    lineEndX = e.pageX - cnvs.offsetLeft,
+                    lineEndY = e.pageY - cnvs.offsetTop;//конечные координаты линии относительно верхнего левого угла canvas равны текущим
+
+                cws.send('{ "width": ' + curWidth + ', "color": ' + curColor + ', "coords": [' + lineStartX + ',' + lineStartY + ',' + lineEndX + ',' + lineEndY + '] }');//отправляем координаты начала и конца линии c разделителем "x"
+                points = [lineEndX, lineEndY];//устанавливаем  начальные координаты следующей линии
+            }
+        };
+        function sendChat() {
+            if (chatIn.value != "") {//если поле не пустое
+                ws.send(chatIn.value);//отправляем сообщение
+            }
+            chatIn.value = "";//очищаем поле
+        };
+        function keyDownChatIn(event) {
+            if (event.keyCode == 13) { //если нажимаем клавишу Enter
+                sendChat();//отправляем сообщение
+            }
+        };
+        function keyDownBody(event) {
+            if (event.keyCode == 13) {//если нажимаем клавишу Enter
+                chatIn.focus();//устанавливаем курсор в поле chatIn
+            }
+        };
+        function onre() {
+            var h = cont.offsetHeight - chatInAndBttn.offsetHeight - cnvsDiv.offsetHeight - 2;//вычисляем высоту чтобы заполнить оставшееся пространство
+            chatOut.style.height = h + "px";//присваиваем полученое значение высоты элементу chatOut
+            //chatOut.innerHTML += h + "px";
+        };
+        function clearCnvs() {
+            cws.send("o");//отправляем сигнал обнулить данные рисунка
+        };
+    </script>
+
+</head>
+
+
+<body onload="init()" onkeydown="keyDownBody(event)" onresize="onre()">
+    <div id="cont">
+        <div id="cnvsAndTxtOut">
+            <div id="cnvsDiv">
+                <canvas id="cnvs" width="800" height="450" onmousedown="mDown(event)" onmousemove="mMove(event)" onmouseup="mUp(event)"></canvas>
+            </div>
+
+            <div id="chatOut">
+            </div>
+        </div>
+
+        <div id="chatInAndBttn">
+            <input type="text" onkeydown="keyDownChatIn(event)" id="chatIn" />
+            <input type="button" id="clearCnvs" onclick="clearCnvs()" value="Очистить" />
+        </div>
+    </div>
+</body>
+</html>

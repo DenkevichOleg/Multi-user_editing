@@ -1,0 +1,163 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type"content="text/html; charset=UTF-8">
+
+    <title>Video</title>
+
+
+    <script type="text/javascript">
+
+        var video;
+        var audio;
+        var log;
+
+        window.onload = function () {
+            log = document.getElementById("log");
+            video = document.getElementById("vcuba");
+            audio = document.getElementById("aud");
+            WriteCanPlay("canplay", video);
+            video.addEventListener("loadeddata", function () {
+                WriteMessage("duration", this.duration);
+                WriteMessage("playbackrate", this.playbackRate)
+            }, false);
+            video.addEventListener("progress", function () {
+                WriteMessage("currenttime", this.currentTime);
+                WriteMessage("volume", this.volume);
+                WriteMessage("playbackrate", this.playbackRate)
+            });
+        }
+
+        function WriteOnLoadstart(idspan, v) {
+            WriteMessage(idspan, v.volume);
+        }
+        function WriteCanPlay(idspan, v) {
+            var txt = "";
+            if (v.canPlayType("video/mp4"))	txt	+=	'	mp4';
+            if (v.canPlayType("video/vebm"))txt	+=	'	vebm';
+            if (v.canPlayType("video/ogg"))	txt	+=	'	ogg';
+            if (v.canPlayType("video/ogv")) txt += '	ogv';
+            if (v.canPlayType("video/avi"))	txt	+=	'	avi';
+            WriteMessage(idspan, txt);
+        }
+        function WriteMessage(idspan, txt) {
+            var span = document.getElementById(idspan);
+            span.innerHTML = txt;
+        }
+
+
+        function exe_volumePlus() {
+            video.volume -= 0.1;
+        }
+        function exe_rateMinus() {
+            video.playbackRate -= 0.1;
+        }
+
+        function exe_volumePlus1() {
+            audio.volume -= 0.1;
+        }
+        function exe_rateMinus1() {
+            audio.playbackRate -= 0.1;
+        }
+
+            function exe_seek() {
+                video.currentTime += 10;
+            }
+
+
+            function exe_cadr(idcanvas) {
+                var canvas = document.getElementById(idcanvas);
+                var context = canvas.getContext("2d");
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            }
+
+            function exe_camera(idspan){
+                navigator.getUserMedia = (navigator.getUserMedia |
+                navigator.webkitGetUserMedia |
+                navigator.mozGetUserMedia |
+                navigator.msGetUsenMedia);
+                //if (navigator.getUserMedia) {
+                    WriteMessage(idspan, 'есть getUserMedia');
+                    navigator.mozGetUserMedia({ audio: true, video: true }, function (stream) {
+                        WriteMessage(idspan, 'включена');
+                    video.src = window.URL.createObjectURL(stream);
+                    }, function () {
+                        WriteMessage(idspan,'ошибка');
+                    });
+                ////}
+               // else WriteMessage(idspan, 'нет getUserMedia');
+            }
+
+        </script>
+        </head>
+        <body>
+
+
+            <section style="width: 600px; float:left ">
+                <video id="vcuba"  poster="../Files/Vid/M.jpg"
+                       
+                       preload="metadata"
+                       loop
+                       controls onloadstart="WriteOnLoadstart('volume', this);">
+                    <source src="../Files/Vid/MOV03068.ogv" type='video/ogg' />
+                    <source src="../Files/Vid/MOV03068.mp4" type='video/mp4' />
+                    6pay3ep He noanepxHBaeT video
+                </video>
+                <div id="videoproperties"style="float:right;width: 350px;">
+            
+                canplay  <span id="canplay"></span><br>
+                playbackrate <span id="playbackrate"></span><br>
+                duration  <span id="duration"></span><br>
+                currenttime  <span id="currenttime"></span><br>
+                volume  <span id="volume"></span><br>
+                getusermedia  <span id="getusermedia"></span><br>
+
+                </div>
+
+            <div id="videomethode"style="float:right;width: 350px;">
+                <input type="button"value="-rpoMKOCTb"onclick="exe_volumePlus()"/>
+                <input type="button"value="-CKopocTb"onclick="exe_rateMinus()"/>
+                <input type="button"value="CMemeHne"onclick="exe_seek()"/>
+                <input type="button"value="KaAp"onclick="exe_cadr('canvasID')"/>
+                <input type="button"value="KaMepa"onclick="exe_camera('getusermedia')"/>
+            </div>
+            </section>
+            <audio id="aud" src="../Files/Aud/Life.mp3"
+                   preload="metadata"
+                   loop
+                   controls onloadstart="WriteOnLoadstart('volume', this);">
+
+                6pay3ep He noanepxHBaeT audio
+            </audio>
+            <input type="button" value="-rpoMKOCTb11" onclick="exe_volumePlus1()" />
+            <input type="button" value="-CKopocTb11" onclick="exe_rateMinus1()" />
+
+
+            <h3>Выберите файл для загрузки</h3>
+
+            @using (Html.BeginForm("Upload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <input type="file" name="uploadVid" accept="video/*,video/ogg" /><br>
+                <input type="file" name="uploadAud" accept="audio/*,audio/mp3" /><br>
+                <input type="text" name="userID" value="View4" hidden="hidden"/><br>
+                <input type="submit" value="Загрузить" />
+            }
+
+
+            <section style="width: 900px; float:left">
+                <canvas id="canvasID" width="200"height="162"
+                style="border-style:solid; border-width:1px;">
+                Браузер не поддерживает canvas
+                </canvas>
+                </section>
+
+
+
+            <div id="log">
+            </div>
+</body>
+</html>

@@ -1,0 +1,156 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Web</title>
+
+    <script type="text/javascript">
+
+
+        var posX = -1;
+        var posY = -1;
+
+
+
+
+        window.onload = function () {
+            if (typeof (Storage) !== "undefined") {
+                var s = "[";
+                for (var p in localStorage) s += (p+', ');
+                s = s.substr(0, s.length-2) +
+                WriteMessage('support', 'да ' +s);
+                console.log('length ', localStorage.length);
+            console.log('cookie', document.cookie.length)
+            }
+            else WriteMessage('support', 'нет');
+
+            var с = document.getElementById('idcanvas');
+            c.addEventListener('click', function (pos) {
+                if (posX != pos.pageX || posY != pos.pageY) {
+                    var context = c.getContext("2d");
+                    context.beginPath();
+                    context.fillStyle = 'Red';
+                    context.arc(pos.pageX - с.offsetLeft,
+                    pos.pageY - c.offsetTop,
+                    30, 0, 2 * Math.PI, false);
+                    context.closePath();
+                    context.fill();
+                }
+            })
+
+        }
+
+        function WriteMessage(idspan, txt) {
+            var span = document.getElementById(idspan);
+            span.innerHTML = txt;
+        }
+
+        function exe_save(idkey, idvalue) {
+            var к = document.getElementById(idkey);
+            var v = document.getElementById(idvalue)
+            localStorage.setItem(k.value, v.value);
+        }
+        function exe_restore(idkey, idvalue) {
+            var к = document.getElementById(idkey);
+            var v = document.getElementById(idvalue)
+            v.value = localStorage.getItem(k.value);
+        }
+
+
+        function exe_savel(idkey, iddate, idtime, idmail) {
+            var k = document.getElementByld(idkey);
+            var d = document.getElementByld(iddate);
+            var t = document.getElementByld(idtime);
+            var m = document.getElementByld(idmail);
+            var o = {date:d.value, time:t.value, mail:m.value};
+            localStorage.setItem(k.value, JSON.stringify(o));
+        }
+        function exe_restorel(idkey, iddate, idtime, idmail) {
+            var k = document.getElementByld(idkey);
+            var d = document.getElementByld(iddate);
+            var t = document.getElementByld(idtime);
+            var m = document.getElementByld(idmail);
+            var so = localStorage.getltem(k.value);
+            var o = JSON.parse(so);
+            d.value = o.date;
+            t.value = o.time;
+            m.value = o.mail;
+        }
+
+
+
+
+    </script>
+        </head>
+        <body>
+
+            <section style="width: 800px; float:left;">
+                <div id=" storoproperties">
+                Web Storage поддерживается?:	<span id="support"></span><br>
+                </div>
+            </section>
+
+            <section style="width: 750px; float:left; border: solid; margin: 5px 5px 5px 5px">
+<div style="margin: 5px 5px 5px 5px">
+                <input type="button" value="CoxpaHMTb" onclick="exe_save('idkey','idvalue')"
+style="width: 100px" />
+                ключ <input id="idkey" type="text" style="width: 70px" />
+                3HaчeHne <input id="idvalue" type="text" style="width: 200px" />
+                <br />
+                <input type="button" value="BoccTaHOBMTb"
+                onclick="exe_restore('idkeyr', 'idvaluer')"
+                style="width: 100px"/>
+                ключ <input id="idkeyr" type="text" style="width: 70px" />
+                3HaчeHne <input id="idvaluer" type="text" style="width: 200px" readonly />
+                </div>
+            </section>
+
+
+            <section style="width: 750px; float:left; border: solid; margin: 5px 5px 5px 5px">
+                <div style=" margin: 5px 5px 5px 5px">
+                <input type="button" value="CoxpaHMTb"
+                       onclick="exe_savel('idkey1','iddate','idtime', 'idmail' )"
+                       style="width: 100px" />
+                ключ <input id="idkey1" type="text" style="width:	70px" />
+                дата <input id="iddate" type="date" style="width:	130px" />
+                время <input id="idtime" type="time" style="width:	100px" />
+                емейл <input id="idmail" type="email" style="width:	100px" />
+
+                <br />
+                    <input type="button" value="BoccTaHOBMTb"
+                           onclick="exe_restorel('idkeyr1', 'iddater1','idtimer1', 'idmailr1' )"
+                           style="width: 100px" />
+                    ключ <input id="idkeyr1" type="text" style="width:	70px" />
+                    дата <input id="iddater1" type="date" style="width:	130px" readonly />
+                    время <input id="idtimer1" type="time" style="width:	100px" readonly />
+                    емейл <input id="idmailr1" type="email" style="width:	100px" readonly />
+                <br />
+                </div>
+            </section>
+            
+            
+
+
+            <section style="width:750px; float:left; border: solid; margin: 5px 5px 5px 5px">
+                <div style="margin: 5px 5px 5px 5px; width:300px; float:left">
+                    <input type="button" value="coxpahmtb"
+                           onclick="exe_saveCanvas('idcanvas', 'idkeysC')" style=" width:100px" />
+                    ioiwm <input id="idkeysC" type="text" style="width:70px"  />
+                    <br />
+                    <input type="button" value="BoccTaHOBMTb"
+onclick ="exe_restoreCanvas('idcanvas','idkeyrC')" style="width:100px" />
+                    ioiwm <input id="idkeyrC" type="text" style="width:70px"  />
+                </div>
+                <canvas id="idcanvas" width="400" height="100"
+                        style="border:groove; float:right;margin:5px 5px 5px 5px"  />
+            </section>
+
+            <div>
+            </div>
+        </body>
+        </html>
